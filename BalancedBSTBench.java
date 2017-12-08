@@ -533,7 +533,7 @@ public final class BalancedBSTBench {
         return new HashMap104<Integer, Integer>();
     }
     static private Map<Integer, Integer> mapTwo() {
-        return new HashMap107<Integer, Integer>();
+        return new HashMap108<Integer, Integer>();
     }
 
 
