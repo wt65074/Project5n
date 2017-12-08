@@ -506,7 +506,7 @@ public class HashMap<K, V> implements Map<K, V> {
             try {
 
                 map.insert(r.nextInt(100000), 0);
-                map.printAll();
+                //map.printAll();
             } catch (IllegalArgumentException e) {
 
                 
@@ -520,7 +520,7 @@ public class HashMap<K, V> implements Map<K, V> {
             map.has(r.nextInt(100000));
         }
 
-        System.out.println("Hashes: " + map.hashes);
+        //System.out.println("Hashes: " + map.hashes);
         
      }
 

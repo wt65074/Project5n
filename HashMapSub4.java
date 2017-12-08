@@ -358,7 +358,7 @@ public class HashMapSub4<K, V> implements Map<K, V> {
         int hash = this.hash(k, 0);
         Entry<K, V> found = this.table[hash];
 
-        if (found != null && found.key.equals(found.key)) {
+        if (found != null && k.equals(found.key)) {
             return found;
         } else if (found == null) {
             // If found is null and nothing has been deleted, then the key does not exist.
@@ -451,7 +451,7 @@ public class HashMapSub4<K, V> implements Map<K, V> {
         s.append("{");
         for (int i = 0; i < this.table.length; i++) {
             Entry<K, V> e = this.table[i];
-            if (e == null) { continue; }
+            if (e == null || e.tombstone) { continue; }
             s.append("" + e.key + ": " + e.value);
             //s.append(" (" + this.hash(e, this.hashOne) + ", " + this.hash(e, this.hashTwo) + ")"); // REMOVE
             if (i < this.table.length - 1) {
@@ -505,8 +505,17 @@ public class HashMapSub4<K, V> implements Map<K, V> {
             }
 
         }
-        for (int i = 0; i < 100000; i++) {
-            map.has(r.nextInt(1000000));
+
+        for (int i = 0; i < 100; i++) {
+
+            try {
+
+                map.get(r.nextInt(1000000));
+            } catch (IllegalArgumentException e) {
+
+                
+            }
+
         }
 
         
