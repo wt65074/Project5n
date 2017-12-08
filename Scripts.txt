@@ -1,4 +1,4 @@
-javac -Xlint:all -classpath ~/java/junit4.jar:. SimpleCounterTest.java
-java -classpath ~/java/junit4.jar:. org.junit.runner.JUnitCore SimpleCounterTest
+javac -Xlint:all -classpath ~/java/junit4.jar:. HashMapTest.java
+java -classpath ~/java/junit4.jar:. org.junit.runner.JUnitCore HashMapTest
 checkstyle -c ~/java/cs226_checks.xml ListDeque.java
 COPYFILE_DISABLE=1 tar -cf 2.tar file* 

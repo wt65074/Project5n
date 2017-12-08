@@ -12,10 +12,14 @@ import java.util.List;
  * @param <K> The key type.
  * @param <V> The value type.
 */
-public class HashMap<K, V> implements Map<K, V> {
+public class HashMap101<K, V> implements Map<K, V> {
 
     static final double MAX_LOAD_FACTOR = 0.5;
     static final int INITIAL_SIZE = 16;
+    static final int HASH_FUNCTIONS = 2;
+
+    static final int HASH_ONE = 0;
+    static final int HASH_TWO = 1;
 
     // Counts the number of elements.
     private int count = 0;
@@ -29,10 +33,6 @@ public class HashMap<K, V> implements Map<K, V> {
     // Underlying array
     private Entry<K, V>[] table;
 
-    // Number of hash functions
-    private int hfCount = 2;
-    private int subTableSize = INITIAL_SIZE / hfCount;
-
     public int rehashes = 0;
     public int unplanned = 0;
 
@@ -40,12 +40,10 @@ public class HashMap<K, V> implements Map<K, V> {
     private static class Entry<K, V> {
         K key;
         V value;
-        int jHash;
 
         Entry(K k, V v) {
             this.key = k;
             this.value = v;
-            jHash = key.hashCode();
         }
 
         @Override
@@ -56,9 +54,10 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     // Instantiates a new hashmap.
-    public HashMap() {
+    public HashMap101() {
 
         table = (Entry<K, V>[]) new Entry[INITIAL_SIZE];
+        hashFunctions = new HashFunction[HASH_FUNCTIONS];
 
         this.newHashFunctions(INITIAL_SIZE);
 
@@ -67,14 +66,9 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private void newHashFunctions(int size) {
-        this.hashFunctions = new HashFunction[this.hfCount];
-        for (int i = 0; i < this.hfCount; i++) {
-            hashFunctions[i] = this.newPowerHashFunction(size / this.hfCount);
+        for (int i = 0; i < this.hashFunctions.length; i++) {
+            this.hashFunctions[i] = this.newPowerHashFunction(size);
         }
-    }
-
-    private int subTableSize() {
-        return this.table.length / this.hfCount;
     }
 
     // Computes the load factor.
@@ -83,13 +77,13 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     // Hashes an entry.
-    private int hash(Entry<K, V> e, int hashIndex) {
-        return hashIndex * subTableSize + this.hashFunctions[hashIndex].hash(e.jHash);    
+    private int hash(Entry<K, V> e, int f) {
+        return this.hash(e.key, f);
     }
 
     // Hashes a key.
-    public int hash(K key, int hashIndex) {
-        return hashIndex * subTableSize + this.hashFunctions[hashIndex].hash(key.hashCode());
+    public int hash(K key, int f) {
+        return this.hashFunctions[f].hash(key.hashCode());
     }
 
     // Returns a new prime hash function.
@@ -104,41 +98,25 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Updates the maximum number of displacements.
     private void updateMaxDisplacements(int size) {
-        int max = (int) (Math.log(size) / Math.log(2)); // Compute log2(size)
-        maxDisplacements = max > 2 ? max : 2; // Always allow at least 2.
-    }
-
-    private String printEntry(Entry<K, V> e) {
-        String toReturn = new String("" + e);
-        toReturn += " (";
-        for (int i = 0; i < this.hfCount; i++) {
-            toReturn += this.hash(e, i) + ",";
-        }
-        toReturn += ")";
-        return toReturn;    
+        maxDisplacements = (int) (Math.log(size) / Math.log(2)); // Compute log2(size)
     }
 
     // Inserts an entry into the table.
     private void insert(Entry<K, V> e) {
 
         // Rehash the table if the load factor is too high.
-        //System.out.println("Load Factor: " + this.count + "/" + this.table.length + " = " + this.loadFactor());
-        //System.out.println("Load Factor: " + this.loadFactor() + " MAX: " + MAX_LOAD_FACTOR);
         if (this.loadFactor() >= MAX_LOAD_FACTOR) {
-            //System.out.println("Planned rehash");
             this.rehash(this.table.length * 2);
         }
 
         Entry<K, V> displaced = place(e);
         
         while (displaced != null) {
-            //System.out.println("Unplanned rehash");
             // The insertion has failed, and displaced still needs to be inserted
             // into the table. We rehash and double the length, because it is likely
             // that if we are seeing duplicate insertions, we are likely to see more,
-            // and we are likely close to the max load factor. We should expand the array
+            // and we are likely close to the max load factor. We should expand the array 
             // now because it is likely we will need to soon.
-            this.unplanned++;
             rehash(this.table.length * 2);
             displaced = place(displaced);
         }
@@ -149,13 +127,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Rehashes into a new underlying table of size size.
     private void rehash(int size) {
-
-        this.subTableSize = size / this.hfCount;
-
-        rehashes++;
-
-        //System.out.println("Rehash");
-
         // Create new table
         Entry<K, V>[] temp = this.table;
 
@@ -169,15 +140,17 @@ public class HashMap<K, V> implements Map<K, V> {
         this.updateMaxDisplacements(size);
 
         // Place all entries in the table.
-        // ADD? Limit on the number of rehashes
         for (Entry<K, V> e: temp) {
             if (this.place(e) != null) {
                 // The placement has failed, reset table and try to hash again.
+                unplanned++;
                 this.table = temp;
                 this.rehash(size);
                 return;
             }
+
         }
+
     }
 
     // Removes a key from the hash. Returns the value removed or null.
@@ -187,20 +160,29 @@ public class HashMap<K, V> implements Map<K, V> {
             return null;
         }
 
-        for (int i = 0; i < this.hashFunctions.length; i++) {
+        // Check the first hash position.
+        int hash1 = this.hash(k, HASH_ONE);
+        Entry<K, V> foundH1 = table[hash1];
 
-            int hash = this.hash(k, i);
-            Entry<K, V> found = this.table[hash];
-
-            if (found != null && found.key.equals(k)) {
-                table[hash] = null;
-                this.count--;
-                return found.value;
-            }
-
+        if (foundH1 != null && foundH1.key.equals(k)) {
+            table[hash1] = null;
+            this.count--;
+            return foundH1.value;
         }
-        
+
+        // Check the second hash position.
+        int hash2 = this.hash(k, HASH_TWO);
+        Entry<K, V> foundH2 = table[hash2];
+
+        if (foundH2 != null && foundH2.key.equals(k)) {
+            table[hash2] = null;
+            this.count--;
+            return foundH2.value;
+        }
+
+        // Not found, return null.
         return null;
+
     }
 
     // Attempts to place an entry in the table. Returns the entry that couldn't be placed
@@ -209,17 +191,16 @@ public class HashMap<K, V> implements Map<K, V> {
 
         if (e == null) { return null; }
 
-        //System.out.println("Placing: " + this.printEntry(e));
-        int funcIndex = 0;
+        int func = HASH_ONE;
         Entry<K, V> current = e;
         int displacements = 0;
 
-
         while (displacements++ < this.maxDisplacements) {
 
-            int position = this.hash(current, funcIndex);
-            Entry<K, V> temp = this.table[position];
-            this.table[position] = current;
+            int position = hash(current, func);
+
+            Entry<K, V> temp = table[position];
+            table[position] = current;
 
             if (temp == null) {
                 // We has succeeded placing the entry.
@@ -228,46 +209,14 @@ public class HashMap<K, V> implements Map<K, V> {
 
             current = temp;
 
-            //System.out.println("Displaced at " + bestPosition + ": " + this.printEntry(current));
-
             // Choose the correct hash function to use.
             // If we displaced an element from its first hash position,
             // we need to move it to its second, and visa versa.
-
-            // Calculates the index of the hash function in the hash function array
-            // position / (table length / number of hash functions)
-            // Ex: position 10 in table of size 24 with 3 hash functions
-            // Should be the second hash function (8 spaces for each hash function)
-            // 10 / (8) = 1
-            // Modulo so that it wraps around to 1
-            //funcIndex = newIndex % hfCount;
-            funcIndex = funcIndex == 0 ? 1 : 0;
-
-            /*
-            bestPosition = -1;
-
-            // Dont want to check the current one, only the other functions
-            for (int i = 0; i < this.hfCount - 1; i++) {
-
-                // Get a new position from a function.
-                int newPosition = hash(current, (funcIndex + i) % hfCount);
-                //System.out.println("Checking position: " + newPosition);
-                // Check if that position is empty
-                if (this.table[newPosition] == null) {
-                    // If it is, we will place at that position
-                    bestPosition = newPosition;
-                    //System.out.println("Chose position");
-                    break;
-                } else {
-                    // If its not, but we havent seen a position yet,
-                    // thats the new best position.
-                    if (bestPosition == -1) {
-                        bestPosition = newPosition;
-                    }
-                }
+            if (hash(temp, HASH_ONE) == position) {
+                func = HASH_TWO;
+            } else {
+                func = HASH_ONE;
             }
-            */
-            
 
         }
 
@@ -284,15 +233,20 @@ public class HashMap<K, V> implements Map<K, V> {
             return null;
         }
 
-        for (int i = 0; i < this.hashFunctions.length; i++) {
+        int hash1 = this.hash(k, HASH_ONE);
+        Entry<K, V> foundH1 = table[hash1];
 
-            int hash = this.hash(k, i);
-            Entry<K, V> found = this.table[hash];
+        // Check first hash value.
+        if (foundH1 != null && foundH1.key.equals(k)) {
+            return foundH1;
+        }
 
-            if (found != null && found.key.equals(k)) {
-                return found;
-            }
+        int hash2 = this.hash(k, HASH_TWO);
+        Entry<K, V> foundH2 = table[hash2];
 
+        // Check second hash value.
+        if (foundH2 != null && foundH2.key.equals(k)) {
+            return foundH2;
         }
 
         return null;
@@ -380,7 +334,6 @@ public class HashMap<K, V> implements Map<K, V> {
                 s.append(", ");
             }
         }
-
         s.append("}");
         return s.toString();
 
@@ -390,49 +343,38 @@ public class HashMap<K, V> implements Map<K, V> {
     public Iterator<K> iterator() {
 
         List<K> keys = new ArrayList<K>();
-        for (Entry<K, V> e: this.table) {
+        for (Entry<K,V> e: this.table) {
             if (e != null) {
                 keys.add(e.key);
             }
+            
         }
 
         return keys.iterator();
 
     }
 
-    public void printAll() {
-
-        for (int i = 0; i < this.subTableSize(); i++) {
-
-            for (int a = i; a < this.table.length; a += this.subTableSize()) {
-                //System.out.print("[");
-                //System.out.print(table[a] != null ? table[a] : "*");
-                //System.out.print("] ");
-            }
-            //System.out.println();
-        }
-
-        //System.out.println();
-
-    }
-
     public static void main(String[] args) {
         
-        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        HashMapSub1<Integer, Integer> map = new HashMapSub1<Integer, Integer>();
         Random r = new Random();
 
-        for (int i = 0; i < 1000 ; i++) {
+        for (int i = 0; i < 100000; i++) {
 
             try {
-                map.insert(r.nextInt(1000), i);
-                //map.printAll();
+
+                map.insert(r.nextInt(1000000), 0);
             } catch (IllegalArgumentException e) {
 
                 
             }
+
         }
 
-        
+        for (int i = 0; i < 100000; i++) {
+            map.has(r.nextInt(1000000));
+        }
+
         
      }
 

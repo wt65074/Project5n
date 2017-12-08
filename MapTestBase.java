@@ -14,12 +14,12 @@ public class MapTestBase {
     @Test
     public void testHas() {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
             assertTrue(map.has(i));
         }
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.remove(i);
             assertTrue(!map.has(i));
         }
@@ -29,23 +29,23 @@ public class MapTestBase {
     @Test
     public void testInsert() {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
             assertTrue(map.has(i));
             assertTrue(map.get(i) == 1);
         }
 
-        assertTrue(map.size() == 10);
+        assertTrue(map.size() == 1000);
 
     }
 
     @Test
     public void testRemove() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
         }
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.remove(i);
             assertTrue(!map.has(i));
         }
@@ -57,7 +57,7 @@ public class MapTestBase {
     public void testIterator() {
 
         /*
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
         }
 
@@ -75,7 +75,7 @@ public class MapTestBase {
     @Test
     public void testToString() {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
         }
 
@@ -88,13 +88,13 @@ public class MapTestBase {
     @Test
     public void testSize() {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
         }
 
-        assertTrue(map.size() == 10);
+        assertTrue(map.size() == 1000);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.remove(i);
         }
 
@@ -105,7 +105,7 @@ public class MapTestBase {
     @Test
     public void testPut() {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
             map.put(i, 2);
             assertTrue(map.get(i) == 2);
@@ -116,7 +116,7 @@ public class MapTestBase {
     @Test
     public void testGet() {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
             map.put(i, 2);
             assertTrue(map.get(i) == 2);
