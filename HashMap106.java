@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.List;
-// Duplicate of HasMap104
+
 /**
  * Hash Table implementation that performs basic operations
  * in O(1) by way of a Cukoo hash table.
@@ -12,10 +12,10 @@ import java.util.List;
  * @param <K> The key type.
  * @param <V> The value type.
 */
-public class HashMap<K, V> implements Map<K, V> {
+public class HashMap106<K, V> implements Map<K, V> {
 
     static final double MAX_LOAD_FACTOR = 0.5;
-    static final int INITIAL_SIZE = 16;
+    static final int INITIAL_SIZE = 24;
     static final int HASH_FUNCTIONS = 2;
 
     static final int HASH_ONE = 0;
@@ -59,7 +59,7 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     // Instantiates a new hashmap.
-    public HashMap() {
+    public HashMap106() {
 
         table = (Entry<K, V>[]) new Entry[INITIAL_SIZE];
         hashFunctions = new HashFunction[HASH_FUNCTIONS];
@@ -71,9 +71,8 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private void newHashFunctions(int size) {
-        for (int i = 0; i < this.hashFunctions.length; i++) {
-            this.hashFunctions[i] = this.newPowerHashFunction(size);
-        }
+        this.hashFunctions[0] = this.newPowerHashFunction(size / 3 * 2);
+        this.hashFunctions[1] = this.newPowerHashFunction(size / 3);
     }
 
     // Computes the load factor.
@@ -88,7 +87,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Hashes a key.
     public int hash(K key, int f) {
-        return this.hashFunctions[f].hash(key.hashCode());
+        return f * (2 * table.length / 3) + this.hashFunctions[f].hash(key.hashCode());
     }
 
     // Returns a new prime hash function.
@@ -178,7 +177,7 @@ public class HashMap<K, V> implements Map<K, V> {
         }
 
         // Check the second hash position.
-        int hash2 = hash1 ^ this.hash(k, HASH_TWO);
+        int hash2 = this.hash(k, HASH_TWO);
         Entry<K, V> foundH2 = table[hash2];
 
         if (foundH2 != null && k.equals(foundH2.key)) {
@@ -199,15 +198,16 @@ public class HashMap<K, V> implements Map<K, V> {
         if (e == null || e.tombstone) { return null; }
 
         Entry<K, V> current = e;
+        int hashFunc = HASH_ONE;
 
-        int position = this.hash(current, HASH_ONE);
+        int position = this.hash(current, hashFunc);
         Entry<K, V> temp = this.table[position];
         if (temp == null || temp.tombstone) {
             this.table[position] = current;
             return null;
         }
 
-        int positionTwo = position ^ this.hash(current, HASH_TWO);
+        int positionTwo = this.hash(current, HASH_TWO);
         Entry<K, V> tempTwo = this.table[positionTwo];
         if (tempTwo == null || tempTwo.tombstone) {
             this.table[positionTwo] = current;
@@ -221,7 +221,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
         do {
 
-            position ^= this.hash(current, HASH_TWO);
+            position = this.hash(current, hashFunc);
 
             temp = table[position];
 
@@ -232,6 +232,8 @@ public class HashMap<K, V> implements Map<K, V> {
 
             this.table[position] = current;
             current = temp;
+
+            hashFunc ^= 1;
 
         } while (++displacements < this.maxDisplacements);
 
@@ -256,7 +258,7 @@ public class HashMap<K, V> implements Map<K, V> {
             return null;
         }
 
-        int hash2 = hash1 ^ this.hash(k, HASH_TWO);
+        int hash2 = this.hash(k, HASH_TWO);
         Entry<K, V> foundH2 = table[hash2];
 
         // Check second hash value.
