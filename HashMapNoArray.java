@@ -14,10 +14,13 @@ import java.util.List;
  * @param <K> The key type.
  * @param <V> The value type.
 */
-public class HashMap<K, V> implements Map<K, V> {
+public class HashMapNoArray<K, V> implements Map<K, V> {
  
     static final double MAX_LOAD_FACTOR = 0.5;
     static final int INITIAL_SIZE = 16;
+
+    static final int HASH_ONE = 0;
+    static final int HASH_TWO = 1;
 
     // Counts the number of elements.
     private int count = 0;
@@ -26,17 +29,14 @@ public class HashMap<K, V> implements Map<K, V> {
     private int maxDisplacements = 0;
 
     // Hash Functions
-    private HashFunction[] hashFunctions;
-
-    private int hfCount = 2;
+    private HashFunction hashOne;
+    private HashFunction hashTwo;
 
     // Underlying array
     private Entry<K, V>[] table;
 
     public int rehashes = 0;
     public int unplanned = 0;
-
-    public int hashes = 0;
 
 
     // Entry pairs up a key and a value.
@@ -65,7 +65,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
 
     // Instantiates a new hashmap.
-    public HashMap() {
+    public HashMapNoArray() {
 
         table = (Entry<K, V>[]) new Entry[INITIAL_SIZE];
 
@@ -76,10 +76,8 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private void newHashFunctions(int size) {
-        this.hashFunctions = new HashFunction[this.hfCount];
-        for (int i = 0; i < this.hfCount; i++) {
-            hashFunctions[i] = this.newPowerHashFunction(size);
-        }
+        this.hashOne = newPowerHashFunction(size);
+        this.hashTwo = newPowerHashFunction(size);
     }
 
     // Computes the load factor.
@@ -94,8 +92,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Hashes a key.
     public int hash(K key, int hashIndex) {
-        hashes++;
-        return this.hashFunctions[hashIndex].hash(key.hashCode());
+        return (hashIndex == HASH_ONE ? this.hashOne : this.hashTwo).hash(key.hashCode());
     }
 
     // Returns a new prime hash function.
@@ -348,7 +345,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private String printEntry(Entry<K, V> e) {
         String toReturn = new String("" + e);
         toReturn += " (";
-        for (int i = 0; i < this.hfCount; i++) {
+        for (int i = 0; i < 2; i++) {
             toReturn += this.hash(e, i) + ",";
         }
         toReturn += ")";
@@ -369,7 +366,7 @@ public class HashMap<K, V> implements Map<K, V> {
             return found;
         } else if (found == null) {
             // If found is null and nothing has been deleted, then the key does not exist.
-            //System.out.println("only executing one search");
+            // System.out.println("only executing one search");
             return null;
         }
 
@@ -498,14 +495,14 @@ public class HashMap<K, V> implements Map<K, V> {
 
     public static void main(String[] args) {
         
-        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        HashMapSub1SearchArrayCheck<Integer, Integer> map = new HashMapSub1SearchArrayCheck<Integer, Integer>();
         Random r = new Random();
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 16; i++) {
 
             try {
 
-                map.insert(r.nextInt(100000), 0);
+                map.insert(r.nextInt(1000), 0);
                 map.printAll();
             } catch (IllegalArgumentException e) {
 
@@ -514,13 +511,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
         }
 
-        map.hashes = 0;
-
-        for (int i = 0; i < 10000; i++) {
-            map.has(r.nextInt(100000));
-        }
-
-        System.out.println("Hashes: " + map.hashes);
+        
         
      }
 

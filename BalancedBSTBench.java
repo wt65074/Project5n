@@ -131,6 +131,8 @@ public final class BalancedBSTBench {
 
         }
 
+        //System.out.println("Rehashes: " + ((HashMap<Integer, Integer>) map).rehashes + " Unplanned: " + ((HashMap<Integer, Integer>) map).unplanned + " For: " + map.size());
+
     }
 
     /*
@@ -150,6 +152,7 @@ public final class BalancedBSTBench {
                 
             }
         }
+        //System.out.println("Rehashes: " + ((HashMap<Integer, Integer>) map).rehashes + " Unplanned: " + ((HashMap<Integer, Integer>) map).unplanned + " For: " + map.size());
         //System.out.println("INserted many " + count++);
 
     }
@@ -216,11 +219,50 @@ public final class BalancedBSTBench {
 
     }
     
+    
+
+
     @Bench
-    public static void randomInsert(Bee b) {
+    public static void linearInsertBase(Bee b) {
+
+
+
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
+            b.start();
+            insertManyLinear(map);
+        }
+    }
+    
+    @Bench
+    public static void randomInsertBase(Bee b) {
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapOne();
+            b.start();
+            insertManyRandom(map);
+        }
+    }
+
+    @Bench
+    public static void linearInsertComp(Bee b) {
+
+
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            b.start();
+            insertManyLinear(map);
+        }
+    }
+    
+    @Bench
+    public static void randomInsertComp(Bee b) {
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
             b.start();
             insertManyRandom(map);
         }
@@ -228,26 +270,13 @@ public final class BalancedBSTBench {
 
 
     @Bench
-    public static void linearInsert(Bee b) {
-
-
-
-        for (int n = 0; n < b.reps(); n++) {
-            b.stop();
-            Map<Integer, Integer> map = map();
-            b.start();
-            insertManyLinear(map);
-        }
-    }
-    
-    @Bench
-    public static void linearRemove(Bee b) {
+    public static void linearRemoveBase(Bee b) {
 
         //System.out.println("Linear Remove");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
             insertManyLinear(map);
             b.start();
             removeMany(map);
@@ -256,13 +285,28 @@ public final class BalancedBSTBench {
     }
 
     @Bench
-    public static void randomRemove(Bee b) {
+    public static void linearRemoveComp(Bee b) {
+
+        //System.out.println("Linear Remove");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyLinear(map);
+            b.start();
+            removeMany(map);
+        }
+        
+    }
+
+    @Bench
+    public static void randomRemoveBase(Bee b) {
 
         //System.out.println("Random Remove");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
             insertManyRandom(map);
             b.start();
             removeMany(map);
@@ -271,13 +315,28 @@ public final class BalancedBSTBench {
     }
 
     @Bench
+    public static void randomRemoveComp(Bee b) {
+
+        //System.out.println("Random Remove");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyRandom(map);
+            b.start();
+            removeMany(map);
+        }
+
+    }
+    /*
+    @Bench
     public static void linearInsertionRemoval(Bee b ) {
 
         //System.out.println("Linear Insert Removal");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapTwo();
             b.start();
             linearInsertionsAndRemovals(map);
         }
@@ -290,11 +349,13 @@ public final class BalancedBSTBench {
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapTwo();
             b.start();
             randomInsertionsAndRemovals(map);
         }
     }
+    */
+
     @Bench
     public static void linearHas(Bee b) {
 
@@ -302,7 +363,7 @@ public final class BalancedBSTBench {
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
             insertManyLinear(map);
             b.start();
             hasMany(map);
@@ -311,13 +372,42 @@ public final class BalancedBSTBench {
     }
 
     @Bench
-    public static void randomHas(Bee b) {
+    public static void linearHasComp(Bee b) {
+
+        //System.out.println("Linear Has");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyLinear(map);
+            b.start();
+            hasMany(map);
+        }
+
+    }
+
+    @Bench
+    public static void randomHasBase(Bee b) {
 
         //System.out.println("Random Has");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyRandom(map);
+            b.start();
+            hasMany(map);
+        }
+    }
+
+    @Bench
+    public static void randomHasComp(Bee b) {
+
+        //System.out.println("Random Has");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
             insertManyRandom(map);
             b.start();
             hasMany(map);
@@ -326,13 +416,13 @@ public final class BalancedBSTBench {
 
 
     @Bench
-    public static void linearGet(Bee b) {
+    public static void linearGetBase(Bee b) {
 
         //System.out.println("Linear Get");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
             insertManyLinear(map);
             b.start();
             getMany(map);
@@ -340,13 +430,41 @@ public final class BalancedBSTBench {
     }
 
     @Bench
-    public static void randomGet(Bee b) {
+    public static void linearGetComp(Bee b) {
+
+        //System.out.println("Linear Get");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyLinear(map);
+            b.start();
+            getMany(map);
+        }
+    }
+
+    @Bench
+    public static void randomGetBase(Bee b) {
 
         //System.out.println("Random Get");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
+            insertManyRandom(map);
+            b.start();
+            getMany(map);
+        }
+    }
+
+    @Bench
+    public static void randomGetComp(Bee b) {
+
+        //System.out.println("Random Get");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
             insertManyRandom(map);
             b.start();
             getMany(map);
@@ -360,7 +478,7 @@ public final class BalancedBSTBench {
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
             insertManyLinear(map);
             b.start();
             putMany(map);
@@ -368,21 +486,54 @@ public final class BalancedBSTBench {
     }
 
     @Bench
-    public static void randomPut(Bee b) {
+    public static void linearPutComp(Bee b) {
+
+        //System.out.println("Linear Put");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyLinear(map);
+            b.start();
+            putMany(map);
+        }
+    }
+
+
+    @Bench
+    public static void randomPutBase(Bee b) {
 
         //System.out.println("Random Put");
 
         for (int n = 0; n < b.reps(); n++) {
             b.stop();
-            Map<Integer, Integer> map = map();
+            Map<Integer, Integer> map = mapOne();
             insertManyRandom(map);
             b.start();
             putMany(map);
         }
     }
 
-    static private Map<Integer, Integer> map() {
-        return new HashMap<Integer, Integer>();
+    @Bench
+    public static void randomPutComp(Bee b) {
+
+        //System.out.println("Random Put");
+
+        for (int n = 0; n < b.reps(); n++) {
+            b.stop();
+            Map<Integer, Integer> map = mapTwo();
+            insertManyRandom(map);
+            b.start();
+            putMany(map);
+        }
+    }
+    
+
+    static private Map<Integer, Integer> mapOne() {
+        return new HashMapSub1<Integer, Integer>();
+    }
+    static private Map<Integer, Integer> mapTwo() {
+        return new HashMapSub4<Integer, Integer>();
     }
 
 

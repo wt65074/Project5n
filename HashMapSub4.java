@@ -14,7 +14,7 @@ import java.util.List;
  * @param <K> The key type.
  * @param <V> The value type.
 */
-public class HashMap<K, V> implements Map<K, V> {
+public class HashMapSub4<K, V> implements Map<K, V> {
  
     static final double MAX_LOAD_FACTOR = 0.5;
     static final int INITIAL_SIZE = 16;
@@ -32,12 +32,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Underlying array
     private Entry<K, V>[] table;
-
-    public int rehashes = 0;
-    public int unplanned = 0;
-
-    public int hashes = 0;
-
 
     // Entry pairs up a key and a value.
     private static class Entry<K, V> {
@@ -65,7 +59,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
 
     // Instantiates a new hashmap.
-    public HashMap() {
+    public HashMapSub4() {
 
         table = (Entry<K, V>[]) new Entry[INITIAL_SIZE];
 
@@ -94,7 +88,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Hashes a key.
     public int hash(K key, int hashIndex) {
-        hashes++;
         return this.hashFunctions[hashIndex].hash(key.hashCode());
     }
 
@@ -110,8 +103,8 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Updates the maximum number of displacements.
     private void updateMaxDisplacements(int size) {
-        int max = (int) (Math.log(size) / Math.log(2)); // Compute log2(size)
-        maxDisplacements = max > 2 ? max : 2; // Always allow at least 2.
+        maxDisplacements = (int) (Math.log(size) / Math.log(2)); // Compute log2(size)
+         // Always allow at least 2.
     }
 
     // Inserts an entry into the table.
@@ -140,7 +133,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
     // Rehashes into a new underlying table of size size.
     private void rehash(int size) {
-        rehashes++;
+
         // Create new table
         Entry<K, V>[] temp = this.table;
 
@@ -155,9 +148,9 @@ public class HashMap<K, V> implements Map<K, V> {
 
         // Place all entries in the table.
         for (Entry<K, V> e: temp) {
+            // Possible to remove this call if there is a tombstone
             if (this.place(e) != null) {
                 // The placement has failed, reset table and try to hash again.
-                unplanned++;
                 this.table = temp;
                 this.rehash(size);
                 return;
@@ -365,7 +358,7 @@ public class HashMap<K, V> implements Map<K, V> {
         int hash = this.hash(k, 0);
         Entry<K, V> found = this.table[hash];
 
-        if (found != null && !found.tombstone && found.key.equals(k)) {
+        if (found != null && found.key.equals(found.key)) {
             return found;
         } else if (found == null) {
             // If found is null and nothing has been deleted, then the key does not exist.
@@ -376,7 +369,7 @@ public class HashMap<K, V> implements Map<K, V> {
         hash = hash ^ this.hash(k, 1);
         found = this.table[hash];
 
-        if (found != null && !found.tombstone && found.key.equals(k)) {
+        if (found != null && k.equals(found.key)) {
             return found;
         }
 
@@ -498,29 +491,24 @@ public class HashMap<K, V> implements Map<K, V> {
 
     public static void main(String[] args) {
         
-        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        HashMapSub4<Integer, Integer> map = new HashMapSub4<Integer, Integer>();
         Random r = new Random();
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
 
             try {
 
-                map.insert(r.nextInt(100000), 0);
-                map.printAll();
+                map.insert(r.nextInt(1000000), 0);
             } catch (IllegalArgumentException e) {
 
                 
             }
 
         }
-
-        map.hashes = 0;
-
-        for (int i = 0; i < 10000; i++) {
-            map.has(r.nextInt(100000));
+        for (int i = 0; i < 100000; i++) {
+            map.has(r.nextInt(1000000));
         }
 
-        System.out.println("Hashes: " + map.hashes);
         
      }
 

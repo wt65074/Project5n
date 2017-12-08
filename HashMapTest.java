@@ -11,7 +11,7 @@ public class HashMapTest extends  MapTestBase {
    @Before
    public void newMap() {
 
-      map = new HashMap<Integer, Integer>();
+      map = new HashMapSub4<Integer, Integer>();
 
    }
 }
