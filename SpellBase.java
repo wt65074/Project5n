@@ -13,19 +13,19 @@ import java.util.regex.Pattern;
  * definiton of "word" in the input text is rather arbitrary and won't
  * make the linguists among you very happy.
  */
-public final class Spell {
+public final class SpellBase {
     private static Map<String, Integer> dictionary;
     private static Pattern pattern = Pattern.compile("[\\s[^a-zA-Z]]+");
 
     // Make checkstyle happy.
-    private Spell() {}
+    private SpellBase() {}
 
     // Load dictionary file with given name.
     private static void load(String name) throws IOException {
         FileReader file = new FileReader(name);
         BufferedReader reader = new BufferedReader(file);
 
-        dictionary = new HashMap107<String, Integer>();
+        dictionary = new HashMap104<String, Integer>();
 
         String line;
         while ((line = reader.readLine()) != null) {
