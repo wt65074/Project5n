@@ -19,7 +19,7 @@ import java.util.List;
 public class HashMap107<K, V> implements Map<K, V> {
 
     static final double MAX_LOAD_FACTOR = 0.5;
-    static final int INITIAL_SIZE = 24;
+    static final int INITIAL_SIZE = 40;
     static final int HASH_FUNCTIONS = 2;
 
     static final int HASH_ONE = 0;
@@ -70,8 +70,8 @@ public class HashMap107<K, V> implements Map<K, V> {
     }
 
     private void newHashFunctions(int size) {
-        this.hashFunctions[0] = this.newPowerHashFunction(size / 3 * 2);
-        this.hashFunctions[1] = this.newPowerHashFunction(size / 3);
+        this.hashFunctions[0] = this.newPowerHashFunction(size / 5 * 4);
+        this.hashFunctions[1] = this.newPowerHashFunction(size / 5);
     }
 
     // Computes the load factor.
@@ -86,7 +86,7 @@ public class HashMap107<K, V> implements Map<K, V> {
 
     // Hashes a key.
     public int hash(K key, int f) {
-        return f * (2 * table.length / 3) + this.hashFunctions[f].hash(key.hashCode());
+        return f * (4 * table.length / 5) + this.hashFunctions[f].hash(key.hashCode());
     }
 
     // Returns a new prime hash function.
