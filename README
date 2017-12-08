@@ -1,0 +1,34 @@
+# Spell Checking Datasets
+
+There are three dictionaries with English words to check spelling against:
+
+- `ogden.dict` is tiny (and useless in practice) at 850 words
+- `scowl-small.dict` is of a reasonably useful size at 50,078 words
+- `scowl-large.dict` will find most problems reliably at 163,100 words
+
+There are three example text files that should be spell-checked:
+
+- `sanity.txt` is tiny (and useless for benchmarking) but the results
+  `Spell.java` spits out are easily checked here
+- `congo.txt` is still pretty short at 323,490 bytes, but it starts to
+  be enough data for your first benchmarks
+- `democracy.txt` is a decent size at 2,000,532 bytes, but depending
+  on the numbers you get you may want to try even bigger inputs
+
+There are also a number of `*.errors` files that contain the expected
+output of `Spell.java` for the indicated combination of dictionary and
+text input.
+For example, `democracy_scowl-small.errors` has the output of checking
+`democracy.txt` against the `scowl-small.dict` dictionary.
+
+A quick way to check whether `Spell.java` using your `HashMap` class
+works is to redirect the output to a file `myerrors` and then use the
+`diff` tool:
+
+```
+$ diff myerrors democracy_scowl-small.errors
+```
+
+If the files match, `diff` makes no output; otherwise it will tell you
+where the two files differ (which may help you track down the problem
+in your code).
