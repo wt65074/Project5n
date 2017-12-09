@@ -61,8 +61,8 @@ public class HashMap108<K, V> implements Map<K, V> {
     */
     public HashMap108() {
 
-        table1 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_ONE];
-        table2 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_TWO];
+        this.table1 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_ONE];
+        this.table2 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_TWO];
 
         hashFunctions = new HashFunction[HASH_FUNCTIONS];
 
@@ -105,7 +105,7 @@ public class HashMap108<K, V> implements Map<K, V> {
     // Updates the maximum number of displacements.
     private void updateMaxDisplacements(int size) {
         // Compute log2(size)
-        maxDisplacements = (int) (Math.log(size * 1.5) / Math.log(2));
+        this.maxDisplacements = (int) (Math.log(size * 1.5) / Math.log(2));
     }
 
     // Rehashes into a new underlying table of size size.
@@ -156,20 +156,20 @@ public class HashMap108<K, V> implements Map<K, V> {
 
         // Check the first hash position.
         int hash1 = this.hash(k, HASH_ONE);
-        Entry<K, V> foundH1 = table1[hash1];
+        Entry<K, V> foundH1 = this.table1[hash1];
 
         if (foundH1 != null && k.equals(foundH1.key)) {
-            table1[hash1] = null;
+            this.table1[hash1] = null;
             this.count--;
             return foundH1.value;
         }
 
         // Check the second hash position.
         int hash2 = this.hash(k, HASH_TWO);
-        Entry<K, V> foundH2 = table2[hash2];
+        Entry<K, V> foundH2 = this.table2[hash2];
 
         if (foundH2 != null && k.equals(foundH2.key)) {
-            table2[hash2] = null;
+            this.table2[hash2] = null;
             this.count--;
             return foundH2.value;
         }
@@ -195,7 +195,7 @@ public class HashMap108<K, V> implements Map<K, V> {
 
             int position = hash(current, func);
 
-            Entry<K, V>[] table = (func == HASH_ONE ? table1 : table2);
+            Entry<K, V>[] table = (func == HASH_ONE ? this.table1 : this.table2);
 
             Entry<K, V> temp = table[position];
             table[position] = current;
@@ -228,7 +228,7 @@ public class HashMap108<K, V> implements Map<K, V> {
         }
 
         int hash1 = this.hash(k, HASH_ONE);
-        Entry<K, V> foundH1 = table1[hash1];
+        Entry<K, V> foundH1 = this.table1[hash1];
 
         // Check first hash value.
         if (foundH1 != null && k.equals(foundH1.key)) {
@@ -236,7 +236,7 @@ public class HashMap108<K, V> implements Map<K, V> {
         }
 
         int hash2 = this.hash(k, HASH_TWO);
-        Entry<K, V> foundH2 = table2[hash2];
+        Entry<K, V> foundH2 = this.table2[hash2];
 
         // Check second hash value.
         if (foundH2 != null && k.equals(foundH2.key)) {
