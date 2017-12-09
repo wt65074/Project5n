@@ -267,7 +267,7 @@ public class HashMap108<K, V> implements Map<K, V> {
             this.rehash(this.table1.length * 2);
         }
 
-        Entry<K, V> displaced = place(e);
+        Entry<K, V> displaced = this.place(e);
 
         while (displaced != null) {
             // The insertion has failed, and displaced still needs
@@ -277,8 +277,8 @@ public class HashMap108<K, V> implements Map<K, V> {
             // and we are likely close to the max load factor.
             // We should expand the array now b ecause it is likely
             // we will need to soon.
-            rehash(this.table1.length * 2);
-            displaced = place(displaced);
+            this.rehash(this.table1.length * 2);
+            displaced = this.place(displaced);
         }
 
         this.count++;
