@@ -51,7 +51,7 @@ public class HashMap<K, V> implements Map<K, V> {
                + " insert is null");
         }
 
-        if (find(k) > 0) {
+        if (this.find(k) > 0) {
             throw new IllegalArgumentException("first argument to"
                + " insert is already mapped");
         }
@@ -59,10 +59,10 @@ public class HashMap<K, V> implements Map<K, V> {
 
         // double table size if 50% full
         if (this.size >= this.arraySize / 2 - 1) {
-            resize(2);
+            this.resize(2);
         }
 
-        int i = hash(k);
+        int i = this.hash(k);
         while (this.nodes[i] != null) {
             if (this.nodes[i].key == null) {
                 break;
@@ -80,7 +80,7 @@ public class HashMap<K, V> implements Map<K, V> {
         if (k == null) {
             throw new IllegalArgumentException("argument to remove() is null");
         }
-        int i = find(k);
+        int i = this.find(k);
         if (i < 0) {
             throw new IllegalArgumentException("Key is not mapped");
         }
@@ -102,7 +102,7 @@ public class HashMap<K, V> implements Map<K, V> {
         if (k == null) {
             throw new IllegalArgumentException("argument to put is null");
         }
-        int index = find(k);
+        int index = this.find(k);
         if (index < 0) {
             throw new IllegalArgumentException("argument to put "
                 + "is not mapped");
@@ -117,7 +117,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private int find(K k) {
 
 
-        int i = hash(k);
+        int i = this.hash(k);
         while (this.nodes[i] != null) {
             if (this.nodes[i].key != null) {
                 if (this.nodes[i].key.equals(k)) {
@@ -140,9 +140,9 @@ public class HashMap<K, V> implements Map<K, V> {
             throw new IllegalArgumentException("argument to get() is null");
         }
 
-        int i = find(k);
+        int i = this.find(k);
 
-        if (find(k) < 0) {
+        if (this.find(k) < 0) {
             throw new IllegalArgumentException("first argument to"
                + " get is not mapped");
         }
@@ -155,7 +155,7 @@ public class HashMap<K, V> implements Map<K, V> {
         if (k == null) {
             return false;
         }
-        return find(k) > 0;
+        return this.find(k) > 0;
     }
 
     @Override
@@ -179,11 +179,12 @@ public class HashMap<K, V> implements Map<K, V> {
         for (int i = 0; i < currentSize; i++) {
             if (this.nodes[i] != null) {
                 int a;
-                for (a = hash(this.nodes[i].key); temp[a] != null;
+                for (a = this.hash(this.nodes[i].key); temp[a] != null;
                     a = (a + 1) % this.arraySize) {
                     a = a;
                 }
-                temp[a] = new Node<K, V>(this.nodes[i].key, this.nodes[i].value);
+                temp[a] = new Node<K, V>(this.nodes[i].key,
+                    this.nodes[i].value);
 
             }
         }
@@ -211,7 +212,7 @@ public class HashMap<K, V> implements Map<K, V> {
         s.append("{");
         for (Iterator<K> i = iterator(); i.hasNext();) {
             K key = i.next();
-            s.append("" + key + ": " + get(key));
+            s.append("" + key + ": " + this.get(key));
             if (i.hasNext()) {
                 s.append(", ");
             }
