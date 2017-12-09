@@ -2,7 +2,6 @@
 // wtobey1@jhu.edu
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.List;
 // This splits into 2, uses asymetric
 
@@ -19,19 +18,19 @@ import java.util.List;
 */
 public class HashMap108<K, V> implements Map<K, V> {
 
-    static final double MAX_LOAD_FACTOR = 0.5;
-    static final int INITIAL_SIZE_ONE = 16;
-    static final int INITIAL_SIZE_TWO = 8;
-    static final int HASH_FUNCTIONS = 2;
+    private static final double MAX_LOAD_FACTOR = 0.5;
+    private static final int INITIAL_SIZE_ONE = 16;
+    private static final int INITIAL_SIZE_TWO = 8;
+    private static final int HASH_FUNCTIONS = 2;
 
-    static final int HASH_ONE = 0;
-    static final int HASH_TWO = 1;
+    private static final int HASH_ONE = 0;
+    private static final int HASH_TWO = 1;
 
     // Counts the number of elements.
-    private int count = 0;
+    private int count;
 
     // Stores how many displacements are okay before a rehash
-    private int maxDisplacements = 0;
+    private int maxDisplacements;
 
     // Hash Functions
     private HashFunction[] hashFunctions;
@@ -39,9 +38,6 @@ public class HashMap108<K, V> implements Map<K, V> {
     // Underlying array
     private Entry<K, V>[] table1;
     private Entry<K, V>[] table2;
-
-    public int rehashes = 0;
-    public int unplanned = 0;
 
     // Entry pairs up a key and a value.
     private static class Entry<K, V> {
@@ -56,11 +52,13 @@ public class HashMap108<K, V> implements Map<K, V> {
         @Override
         public String toString() {
             return this.key + ": " + this.value;
-        } 
+        }
 
     }
 
-    // Instantiates a new hashmap.
+    /**
+     * Instantiates a new hash map.
+    */
     public HashMap108() {
 
         table1 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_ONE];
@@ -90,12 +88,12 @@ public class HashMap108<K, V> implements Map<K, V> {
     }
 
     // Hashes a key.
-    public int hash(K key, int f) {
+    private int hash(K key, int f) {
         return this.hashFunctions[f].hash(key.hashCode());
     }
 
     // Returns a new prime hash function.
-    public HashFunction newPrimeHashFunction(int size) {
+    private HashFunction newPrimeHashFunction(int size) {
         return UniversalHashes.prime(size);
     }
 
@@ -106,31 +104,8 @@ public class HashMap108<K, V> implements Map<K, V> {
 
     // Updates the maximum number of displacements.
     private void updateMaxDisplacements(int size) {
-        maxDisplacements = (int) (Math.log(size * 1.5) / Math.log(2)); // Compute log2(size)
-    }
-
-    // Inserts an entry into the table.
-    private void insert(Entry<K, V> e) {
-
-        // Rehash the table if the load factor is too high.
-        if (this.loadFactor() >= MAX_LOAD_FACTOR) {
-            this.rehash(this.table1.length * 2);
-        }
-
-        Entry<K, V> displaced = place(e);
-        
-        while (displaced != null) {
-            // The insertion has failed, and displaced still needs to be inserted
-            // into the table. We rehash and double the length, because it is likely
-            // that if we are seeing duplicate insertions, we are likely to see more,
-            // and we are likely close to the max load factor. We should expand the array 
-            // now because it is likely we will need to soon.
-            rehash(this.table1.length * 2);
-            displaced = place(displaced);
-        }
-
-        this.count++;
-
+        // Compute log2(size)
+        maxDisplacements = (int) (Math.log(size * 1.5) / Math.log(2));
     }
 
     // Rehashes into a new underlying table of size size.
@@ -153,7 +128,6 @@ public class HashMap108<K, V> implements Map<K, V> {
         for (Entry<K, V> e: temp1) {
             if (this.place(e) != null) {
                 // The placement has failed, reset table and try to hash again.
-                unplanned++;
                 this.table1 = temp1;
                 this.table2 = temp2;
                 this.rehash(size);
@@ -164,7 +138,6 @@ public class HashMap108<K, V> implements Map<K, V> {
         for (Entry<K, V> e: temp2) {
             if (this.place(e) != null) {
                 // The placement has failed, reset table and try to hash again.
-                unplanned++;
                 this.table1 = temp1;
                 this.table2 = temp2;
                 this.rehash(size);
@@ -205,11 +178,14 @@ public class HashMap108<K, V> implements Map<K, V> {
 
     }
 
-    // Attempts to place an entry in the table. Returns the entry that couldn't be placed
-    // if too many displacements are attempted. 
+    // Attempts to place an entry in the table. Returns
+    // the entry that couldn't be placed if too many
+    // displacements are attempted.
     private Entry<K, V> place(Entry<K, V> e) {
 
-        if (e == null) { return null; }
+        if (e == null) {
+            return null;
+        }
 
         int func = HASH_ONE;
         Entry<K, V> current = e;
@@ -283,6 +259,32 @@ public class HashMap108<K, V> implements Map<K, V> {
 
     }
 
+    // Inserts an entry into the table.
+    private void insert(Entry<K, V> e) {
+
+        // Rehash the table if the load factor is too high.
+        if (this.loadFactor() >= MAX_LOAD_FACTOR) {
+            this.rehash(this.table1.length * 2);
+        }
+
+        Entry<K, V> displaced = place(e);
+
+        while (displaced != null) {
+            // The insertion has failed, and displaced still needs
+            // to be inserted into the table. We rehash and double
+            // the length, because it is likely that if we are
+            // seeing duplicate insertions, we are likely to see more
+            // and we are likely close to the max load factor.
+            // We should expand the array now b ecause it is likely
+            // we will need to soon.
+            rehash(this.table1.length * 2);
+            displaced = place(displaced);
+        }
+
+        this.count++;
+
+    }
+
     @Override
     public V remove(K k) throws IllegalArgumentException {
 
@@ -345,14 +347,17 @@ public class HashMap108<K, V> implements Map<K, V> {
         s.append("{");
         for (int i = 0; i < this.table1.length; i++) {
             Entry<K, V> e = this.table1[i];
-            if (e == null) { continue; }
+            if (e == null) {
+                continue;
+            }
             s.append("" + e.key + ": " + e.value);
         }
         for (int i = 0; i < this.table2.length; i++) {
             Entry<K, V> e = this.table2[i];
-            if (e == null) { continue; }
+            if (e == null) {
+                continue;
+            }
             s.append("" + e.key + ": " + e.value);
-            //s.append(" (" + this.hash(e, this.hashOne) + ", " + this.hash(e, this.hashTwo) + ")"); // REMOVE
             if (i < this.table2.length - 1) {
                 s.append(", ");
             }
@@ -366,12 +371,12 @@ public class HashMap108<K, V> implements Map<K, V> {
     public Iterator<K> iterator() {
 
         List<K> keys = new ArrayList<K>();
-        for (Entry<K,V> e: this.table1) {
+        for (Entry<K, V> e: this.table1) {
             if (e != null) {
                 keys.add(e.key);
             }
         }
-        for (Entry<K,V> e: this.table2) {
+        for (Entry<K, V> e: this.table2) {
             if (e != null) {
                 keys.add(e.key);
             }
@@ -380,30 +385,5 @@ public class HashMap108<K, V> implements Map<K, V> {
         return keys.iterator();
 
     }
-
-    public static void main(String[] args) {
-        
-        HashMapSub1<Integer, Integer> map = new HashMapSub1<Integer, Integer>();
-        Random r = new Random();
-
-        for (int i = 0; i < 100000; i++) {
-
-            try {
-
-                map.insert(r.nextInt(1000000), 0);
-            } catch (IllegalArgumentException e) {
-
-                
-            }
-
-        }
-
-        for (int i = 0; i < 100000; i++) {
-            map.has(r.nextInt(1000000));
-        }
-
-        
-     }
-
 
 }
