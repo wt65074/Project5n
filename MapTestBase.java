@@ -75,13 +75,17 @@ public class MapTestBase {
     @Test
     public void testToString() {
 
-        for (int i = 0; i < 1000; i++) {
-            map.insert(i, 1);
-        }
 
-        String s = "{0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1}";
+        // I cant really test a whole lot here because of the randomness of the
+        // hash maps. The keys could be printed in any order, so the only tests
+        // I can really make are checking it when empty and after one insertion.
 
-        // assertEquals(s, map.toString());
+        assertEquals("{}", map.toString());
+
+        map.insert(1, 0);
+
+        assertEquals("{1: 0}", map.toString());
+
 
     }
 
@@ -124,25 +128,21 @@ public class MapTestBase {
 
     }
 
-    @Test
-    public void testInsertException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testInsertExceptionNull() {
 
-        try {
-            map.insert(null, 1);
-            assertTrue(false);
-        } catch (IllegalArgumentException e) {
+        map.insert(null, 1);
 
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInsertExceptionDuplicate() {
+        
+        for (int i = 0; i < 1000; i++) {
+            map.insert(i, 10);
         }
 
-        map.insert(1, 1);
-
-        try {
-            map.insert(1, 1);
-            assertTrue(false);
-        }
-        catch (IllegalArgumentException e) {
-
-        }
+        map.insert(121, 1);
 
     }
 

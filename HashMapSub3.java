@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.List;
 
-// Sub 3
-
 /**
  * Hash Table implementation that performs basic operations
  * in O(1) by way of a Cukoo hash table.
@@ -14,7 +12,7 @@ import java.util.List;
  * @param <K> The key type.
  * @param <V> The value type.
 */
-public class HashMap<K, V> implements Map<K, V> {
+public class HashMapSub3<K, V> implements Map<K, V> {
 
     static final double MAX_LOAD_FACTOR = 0.91;
     static final int INITIAL_SIZE = 48;
@@ -58,7 +56,7 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     // Instantiates a new hashmap.
-    public HashMap() {
+    public HashMapSub3() {
 
         table = (Entry<K, V>[]) new Entry[INITIAL_SIZE];
 

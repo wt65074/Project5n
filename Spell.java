@@ -25,7 +25,7 @@ public final class Spell {
         FileReader file = new FileReader(name);
         BufferedReader reader = new BufferedReader(file);
 
-        dictionary = new HashMap108<String, Integer>();
+        dictionary = new HashMapOncea<String, Integer>();
 
         String line;
         while ((line = reader.readLine()) != null) {

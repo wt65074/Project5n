@@ -25,7 +25,7 @@ public final class SpellBase {
         FileReader file = new FileReader(name);
         BufferedReader reader = new BufferedReader(file);
 
-        dictionary = new HashMap104<String, Integer>();
+        dictionary = new HashMap<String, Integer>();
 
         String line;
         while ((line = reader.readLine()) != null) {

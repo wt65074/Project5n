@@ -64,7 +64,7 @@ public class HashMap108<K, V> implements Map<K, V> {
         this.table1 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_ONE];
         this.table2 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_TWO];
 
-        hashFunctions = new HashFunction[HASH_FUNCTIONS];
+        this.hashFunctions = new HashFunction[HASH_FUNCTIONS];
 
         this.newHashFunctions(INITIAL_SIZE_ONE);
 
@@ -193,9 +193,9 @@ public class HashMap108<K, V> implements Map<K, V> {
 
         while (displacements++ < this.maxDisplacements) {
 
-            int position = hash(current, func);
+            int position = this.hash(current, func);
 
-            Entry<K, V>[] table = (func == HASH_ONE ? this.table1 : this.table2);
+            Entry<K, V>[] table = (func==HASH_ONE ? this.table1 : this.table2);
 
             Entry<K, V> temp = table[position];
             table[position] = current;
