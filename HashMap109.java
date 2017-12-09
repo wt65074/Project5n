@@ -17,7 +17,7 @@ import java.util.List;
  * @param <K> The key type.
  * @param <V> The value type.
 */
-public class HashMap108<K, V> implements Map<K, V> {
+public class HashMap109<K, V> implements Map<K, V> {
 
     static final double MAX_LOAD_FACTOR = 0.5;
     static final int INITIAL_SIZE_ONE = 16;
@@ -30,6 +30,10 @@ public class HashMap108<K, V> implements Map<K, V> {
     // Counts the number of elements.
     private int count = 0;
 
+    // Table One Size
+    private int tOneSize = INITIAL_SIZE_ONE;
+    private int tTwoSize = INITIAL_SIZE_TWO;
+
     // Stores how many displacements are okay before a rehash
     private int maxDisplacements = 0;
 
@@ -37,11 +41,8 @@ public class HashMap108<K, V> implements Map<K, V> {
     private HashFunction[] hashFunctions;
 
     // Underlying array
-    private Entry<K, V>[] table1;
-    private Entry<K, V>[] table2;
-
-    public int rehashes = 0;
-    public int unplanned = 0;
+    private ArrayList<Entry<K,V>> table1;
+    private ArrayList<Entry<K,V>> table2;
 
     // Entry pairs up a key and a value.
     private static class Entry<K, V> {
@@ -61,10 +62,10 @@ public class HashMap108<K, V> implements Map<K, V> {
     }
 
     // Instantiates a new hashmap.
-    public HashMap108() {
+    public HashMap109() {
 
-        table1 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_ONE];
-        table2 = (Entry<K, V>[]) new Entry[INITIAL_SIZE_TWO];
+        table1 = new ArrayList<Entry<K,V>>(INITIAL_SIZE_ONE);
+        table2 = new ArrayList<Entry<K,V>>(INITIAL_SIZE_TWO);
 
         hashFunctions = new HashFunction[HASH_FUNCTIONS];
 
@@ -81,7 +82,7 @@ public class HashMap108<K, V> implements Map<K, V> {
 
     // Computes the load factor.
     private double loadFactor() {
-        return (double) this.count / (this.table1.length + this.table2.length);
+        return (double) this.count / (tOneSize + tTwoSize);
     }
 
     // Hashes an entry.
@@ -114,7 +115,7 @@ public class HashMap108<K, V> implements Map<K, V> {
 
         // Rehash the table if the load factor is too high.
         if (this.loadFactor() >= MAX_LOAD_FACTOR) {
-            this.rehash(this.table1.length * 2);
+            this.rehash(this.tOneSize * 2);
         }
 
         Entry<K, V> displaced = place(e);
@@ -125,7 +126,7 @@ public class HashMap108<K, V> implements Map<K, V> {
             // that if we are seeing duplicate insertions, we are likely to see more,
             // and we are likely close to the max load factor. We should expand the array 
             // now because it is likely we will need to soon.
-            rehash(this.table1.length * 2);
+            rehash(this.tOneSize * 2);
             displaced = place(displaced);
         }
 
@@ -136,15 +137,15 @@ public class HashMap108<K, V> implements Map<K, V> {
     // Rehashes into a new underlying table of size size.
     private void rehash(int size) {
         // Create new table
-        Entry<K, V>[] temp1 = this.table1;
-        Entry<K, V>[] temp2 = this.table2;
+        ArrayList<Entry<K,V>> temp1 = this.table1;
+        ArrayList<Entry<K,V>> temp2 = this.table2;
 
         // Create new hashing functions
         this.newHashFunctions(size);
 
         // Create a new empty table.
-        this.table1 = (Entry<K, V>[]) new Entry[size];
-        this.table2 = (Entry<K, V>[]) new Entry[size];
+        this.table1 = new ArrayList<Entry<K,V>>();
+        this.table2 = new ArrayList<Entry<K,V>>();
 
         // Update the maximum displacements based on the new size.
         this.updateMaxDisplacements(size);
@@ -153,7 +154,6 @@ public class HashMap108<K, V> implements Map<K, V> {
         for (Entry<K, V> e: temp1) {
             if (this.place(e) != null) {
                 // The placement has failed, reset table and try to hash again.
-                unplanned++;
                 this.table1 = temp1;
                 this.table2 = temp2;
                 this.rehash(size);
@@ -164,13 +164,15 @@ public class HashMap108<K, V> implements Map<K, V> {
         for (Entry<K, V> e: temp2) {
             if (this.place(e) != null) {
                 // The placement has failed, reset table and try to hash again.
-                unplanned++;
                 this.table1 = temp1;
                 this.table2 = temp2;
                 this.rehash(size);
                 return;
             }
         }
+
+        tOneSize *= 2;
+        tTwoSize *= 2;
 
     }
 
@@ -183,20 +185,20 @@ public class HashMap108<K, V> implements Map<K, V> {
 
         // Check the first hash position.
         int hash1 = this.hash(k, HASH_ONE);
-        Entry<K, V> foundH1 = table1[hash1];
+        Entry<K, V> foundH1 = table1.get(hash1);
 
         if (foundH1 != null && k.equals(foundH1.key)) {
-            table1[hash1] = null;
+            table1.remove(hash1);
             this.count--;
             return foundH1.value;
         }
 
         // Check the second hash position.
         int hash2 = this.hash(k, HASH_TWO);
-        Entry<K, V> foundH2 = table2[hash2];
+        Entry<K, V> foundH2 = table2.get(hash2);
 
         if (foundH2 != null && k.equals(foundH2.key)) {
-            table2[hash2] = null;
+            table2.remove(hash2);
             this.count--;
             return foundH2.value;
         }
@@ -219,10 +221,10 @@ public class HashMap108<K, V> implements Map<K, V> {
 
             int position = hash(current, func);
 
-            Entry<K, V>[] table = (func == HASH_ONE ? table1 : table2);
+            ArrayList<Entry<K,V>> table = (func == HASH_ONE ? table1 : table2);
 
-            Entry<K, V> temp = table[position];
-            table[position] = current;
+            Entry<K, V> temp = table.get(position);
+            table.set(position, current);
 
             if (temp == null) {
                 // We has succeeded placing the entry.
@@ -252,7 +254,7 @@ public class HashMap108<K, V> implements Map<K, V> {
         }
 
         int hash1 = this.hash(k, HASH_ONE);
-        Entry<K, V> foundH1 = table1[hash1];
+        Entry<K, V> foundH1 = table1.get(hash1);
 
         // Check first hash value.
         if (foundH1 != null && k.equals(foundH1.key)) {
@@ -260,7 +262,7 @@ public class HashMap108<K, V> implements Map<K, V> {
         }
 
         int hash2 = this.hash(k, HASH_TWO);
-        Entry<K, V> foundH2 = table2[hash2];
+        Entry<K, V> foundH2 = table2.get(hash2);
 
         // Check second hash value.
         if (foundH2 != null && k.equals(foundH2.key)) {
@@ -343,17 +345,17 @@ public class HashMap108<K, V> implements Map<K, V> {
 
         StringBuilder s = new StringBuilder();
         s.append("{");
-        for (int i = 0; i < this.table1.length; i++) {
-            Entry<K, V> e = this.table1[i];
+        for (int i = 0; i < this.tTwoSize; i++) {
+            Entry<K, V> e = this.table1.get(i);
             if (e == null) { continue; }
             s.append("" + e.key + ": " + e.value);
         }
-        for (int i = 0; i < this.table2.length; i++) {
-            Entry<K, V> e = this.table2[i];
+        for (int i = 0; i < this.tOneSize; i++) {
+            Entry<K, V> e = this.table2.get(i);
             if (e == null) { continue; }
             s.append("" + e.key + ": " + e.value);
             //s.append(" (" + this.hash(e, this.hashOne) + ", " + this.hash(e, this.hashTwo) + ")"); // REMOVE
-            if (i < this.table2.length - 1) {
+            if (i < this.tTwoSize - 1) {
                 s.append(", ");
             }
         }

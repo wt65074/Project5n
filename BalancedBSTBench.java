@@ -530,10 +530,10 @@ public final class BalancedBSTBench {
     
 
     static private Map<Integer, Integer> mapOne() {
-        return new HashMap104<Integer, Integer>();
+        return new HashMapSub1<Integer, Integer>();
     }
     static private Map<Integer, Integer> mapTwo() {
-        return new HashMap108<Integer, Integer>();
+        return new HashMap104<Integer, Integer>();
     }
 
 
