@@ -10,8 +10,7 @@ import java.util.ArrayList;
  *  @param <V> value type.
  */
 
-public class HashMapOncea<K extends Comparable<? super K>, V>
-    implements Map<K, V> {
+public class HashMap<K, V> implements Map<K, V> {
 
     private static final int ARRAY_SIZE = 16;
     private int size;
@@ -38,7 +37,7 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
     /**
      * Constructor.
      */
-    public HashMapOncea() {
+    public HashMap() {
         this.arraySize = ARRAY_SIZE;
         this.size = 0;
         nodes =  (Node<K, V>[]) new Node[ARRAY_SIZE];
@@ -59,20 +58,20 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
 
 
         // double table size if 50% full
-        if (this.size >= arraySize / 2 - 1) {
+        if (this.size >= this.arraySize / 2 - 1) {
             resize(2);
         }
 
         int i = hash(k);
-        while (nodes[i] != null) {
-            if (nodes[i].key == null) {
+        while (this.nodes[i] != null) {
+            if (this.nodes[i].key == null) {
                 break;
             }
 
-            i = (i + 1) % arraySize;
+            i = (i + 1) % this.arraySize;
         }
 
-        nodes[i] = new Node<K, V>(k, v);
+        this.nodes[i] = new Node<K, V>(k, v);
         this.size++;
     }
 
@@ -86,8 +85,8 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
             throw new IllegalArgumentException("Key is not mapped");
         }
 
-        V value = nodes[i].value;
-        nodes[i].key = null;
+        V value = this.nodes[i].value;
+        this.nodes[i].key = null;
 
         this.size--;
 
@@ -108,7 +107,7 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
             throw new IllegalArgumentException("argument to put "
                 + "is not mapped");
         }
-        nodes[index].value = v;
+        this.nodes[index].value = v;
     }
 
     /** Finds the index location of a given value.
@@ -119,14 +118,14 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
 
 
         int i = hash(k);
-        while (nodes[i] != null) {
-            if (nodes[i].key != null) {
-                if (nodes[i].key.equals(k)) {
+        while (this.nodes[i] != null) {
+            if (this.nodes[i].key != null) {
+                if (this.nodes[i].key.equals(k)) {
                     return i;
                 }
             }
 
-            i = (i + 1) % arraySize;
+            i = (i + 1) % this.arraySize;
         }
 
 
@@ -148,7 +147,7 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
                + " get is not mapped");
         }
 
-        return nodes[i].value;
+        return this.nodes[i].value;
     }
 
     @Override
@@ -165,7 +164,7 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
     }
 
     private int hash(K key) {
-        return (key.hashCode() & 0x7fffffff) % arraySize;
+        return (key.hashCode() & 0x7fffffff) % this.arraySize;
     }
 
     // resizes the hash table to the given
@@ -173,22 +172,22 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
 
     private void resize(int multi) {
 
-        int newSize = (arraySize * multi);
+        int newSize = (this.arraySize * multi);
         Node<K, V>[] temp = (Node<K, V>[]) new Node[newSize];
-        int currentSize = arraySize;
-        arraySize = newSize;
+        int currentSize = this.arraySize;
+        this.arraySize = newSize;
         for (int i = 0; i < currentSize; i++) {
-            if (nodes[i] != null) {
+            if (this.nodes[i] != null) {
                 int a;
-                for (a = hash(nodes[i].key); temp[a] != null;
-                    a = (a + 1) % arraySize) {
+                for (a = hash(this.nodes[i].key); temp[a] != null;
+                    a = (a + 1) % this.arraySize) {
                     a = a;
                 }
-                temp[a] = new Node<K, V>(nodes[i].key, nodes[i].value);
+                temp[a] = new Node<K, V>(this.nodes[i].key, this.nodes[i].value);
 
             }
         }
-        nodes = temp;
+        this.nodes = temp;
 
     }
 
@@ -196,10 +195,10 @@ public class HashMapOncea<K extends Comparable<? super K>, V>
     @Override
     public Iterator<K> iterator() {
         List<K> list = new ArrayList<K>();
-        for (int i = 0; i < arraySize; i++) {
-            if (nodes[i] != null) {
-                if (nodes[i].key != null) {
-                    list.add(nodes[i].key);
+        for (int i = 0; i < this.arraySize; i++) {
+            if (this.nodes[i] != null) {
+                if (this.nodes[i].key != null) {
+                    list.add(this.nodes[i].key);
                 }
             }
         }
