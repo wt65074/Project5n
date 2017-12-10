@@ -23,14 +23,14 @@ public class HashMap<K, V> implements Map<K, V> {
     private static final int INITIAL_SIZE_TWO = 8;
     private static final int HASH_FUNCTIONS = 2;
 
-    private static final int HASH_ONE = 0;
-    private static final int HASH_TWO = 1;
+    private static final int HASH_1 = 0;
+    private static final int HASH_2 = 1;
 
     // Counts the number of elements.
     private int count;
 
     // Stores how many displacements are okay before a rehash
-    private int maxDisplacement;
+    private int maxDisplacements;
 
     // Hash Functions
     private HashFunction[] hashFunctions;
@@ -105,7 +105,7 @@ public class HashMap<K, V> implements Map<K, V> {
     // Updates the maximum number of displacements.
     private void updateMaxDisplacements(int size) {
         // Compute log2(size)
-        this.maxDisplacement = (int) (Math.log(size * 1.5) / Math.log(2));
+        this.maxDisplacements = (int) (Math.log(size * 1.5) / Math.log(2));
     }
 
     // Rehashes into a new underlying table of size size.
@@ -155,7 +155,7 @@ public class HashMap<K, V> implements Map<K, V> {
         }
 
         // Check the first hash position.
-        int hash1 = this.hash(k, HASH_ONE);
+        int hash1 = this.hash(k, HASH_1);
         Entry<K, V> foundH1 = this.table1[hash1];
 
         if (foundH1 != null && k.equals(foundH1.key)) {
@@ -165,7 +165,7 @@ public class HashMap<K, V> implements Map<K, V> {
         }
 
         // Check the second hash position.
-        int hash2 = this.hash(k, HASH_TWO);
+        int hash2 = this.hash(k, HASH_2);
         Entry<K, V> foundH2 = this.table2[hash2];
 
         if (foundH2 != null && k.equals(foundH2.key)) {
@@ -187,15 +187,15 @@ public class HashMap<K, V> implements Map<K, V> {
             return null;
         }
 
-        int func = HASH_ONE;
+        int func = HASH_1;
         Entry<K, V> current = e;
         int displacements = 0;
 
-        while (displacements++ < this.maxDisplacement) {
+        while (displacements++ < this.maxDisplacements) {
 
             int position = this.hash(current, func);
 
-            Entry<K, V>[] table = (func == HASH_ONE ? this.table1 : this.table2);
+            Entry<K, V>[] table = (func == HASH_1 ? this.table1 : this.table2);
 
             Entry<K, V> temp = table[position];
             table[position] = current;
@@ -227,7 +227,7 @@ public class HashMap<K, V> implements Map<K, V> {
             return null;
         }
 
-        int hash1 = this.hash(k, HASH_ONE);
+        int hash1 = this.hash(k, HASH_1);
         Entry<K, V> foundH1 = this.table1[hash1];
 
         // Check first hash value.
@@ -235,7 +235,7 @@ public class HashMap<K, V> implements Map<K, V> {
             return foundH1;
         }
 
-        int hash2 = this.hash(k, HASH_TWO);
+        int hash2 = this.hash(k, HASH_2);
         Entry<K, V> foundH2 = this.table2[hash2];
 
         // Check second hash value.
