@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *  @param <V> value type.
  */
 
-public class HashMap<K, V> implements Map<K, V> {
+public class HashMapOncea<K, V> implements Map<K, V> {
 
     private static final int ARRAY_SIZE = 16;
     private int size;
@@ -37,7 +37,7 @@ public class HashMap<K, V> implements Map<K, V> {
     /**
      * Constructor.
      */
-    public HashMap() {
+    public HashMapOncea() {
         this.arraySize = ARRAY_SIZE;
         this.size = 0;
         nodes =  (Node<K, V>[]) new Node[ARRAY_SIZE];

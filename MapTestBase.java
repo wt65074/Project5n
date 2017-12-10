@@ -4,6 +4,7 @@
 import java.util.Iterator; 
 import org.junit.Test;
 import org.junit.Before;
+import java.util.HashMap;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -16,11 +17,17 @@ public class MapTestBase {
 
         for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
-            assertTrue(map.has(i));
+        }
+
+        for (int i = 1000; i < 2000; i++) {
+            assertTrue(!map.has(i));
         }
 
         for (int i = 0; i < 1000; i++) {
             map.remove(i);
+        }
+
+        for (int i = 0; i < 1000; i++) {
             assertTrue(!map.has(i));
         }
 
@@ -30,9 +37,21 @@ public class MapTestBase {
     public void testInsert() {
 
         for (int i = 0; i < 1000; i++) {
-            map.insert(i, 1);
+            
+            map.insert(i, i);
+            
+        }
+
+        for (int i = 0; i < 1000; i++) {
+            
+            assertTrue(map.get(i) == i);
+            
+        }
+
+        for (int i = 0; i < 1000; i++) {
+            
             assertTrue(map.has(i));
-            assertTrue(map.get(i) == 1);
+            
         }
 
         assertTrue(map.size() == 1000);
@@ -41,24 +60,41 @@ public class MapTestBase {
 
     @Test
     public void testRemove() {
+
         for (int i = 0; i < 1000; i++) {
+            
             map.insert(i, 1);
+
         }
 
         for (int i = 0; i < 1000; i++) {
+            
             map.remove(i);
+
+        }
+
+        for (int i = 0; i < 1000; i++) {
+
             assertTrue(!map.has(i));
+
         }
 
         assertTrue(map.size() == 0);
+
     }
 
     @Test
     public void testIterator() {
 
-        /*
+        // Just used to quickly check if iterator has some stuff
+        // Not cheating, just dont want to use my own map class
+        // to verify my map class is working.
+        HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>();
+
         for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
+            hashMap.put(i, 1);
+
         }
 
         int count = 0;
@@ -66,10 +102,17 @@ public class MapTestBase {
         Iterator<Integer> iterator = map.iterator();
 
         while( iterator.hasNext() ) {
-            int key = iterator.next();
-            assertTrue(key == count++);
+            count++;
+            hashMap.remove(iterator.next());
+
         }
-    */
+
+        // IF every element has been removed from the hash map, 
+        // the iterator got all elements.
+        assertTrue(hashMap.size() == 0);
+
+        assertTrue(count == map.size());
+
     }
 
     @Test
@@ -98,7 +141,13 @@ public class MapTestBase {
 
         assertTrue(map.size() == 1000);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 500; i++) {
+            map.remove(i);
+        }
+
+        assertTrue(map.size() == 500);
+
+        for (int i = 500; i < 1000; i++) {
             map.remove(i);
         }
 
@@ -112,6 +161,9 @@ public class MapTestBase {
         for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
             map.put(i, 2);
+        }
+
+        for (int i = 0; i < 1000; i++) {
             assertTrue(map.get(i) == 2);
         }
 
@@ -122,8 +174,31 @@ public class MapTestBase {
 
         for (int i = 0; i < 1000; i++) {
             map.insert(i, 1);
+        }
+
+        // Test Get
+        for (int i = 0; i < 1000; i++) {
+            assertTrue(map.get(i) == 1);
+        }
+
+        for (int i = 0; i < 500; i++) {
             map.put(i, 2);
+        }
+        for (int i = 500; i < 750; i++) {
+            map.put(i, 3);
+        }
+        for (int i = 750; i < 100; i++) {
+            map.put(i, 4);
+        }
+
+        for (int i = 0; i < 500; i++) {
             assertTrue(map.get(i) == 2);
+        }
+        for (int i = 500; i < 750; i++) {
+            assertTrue(map.get(i) == 3);
+        }
+        for (int i = 750; i < 100; i++) {
+            assertTrue(map.get(i) == 4);
         }
 
     }
@@ -146,61 +221,56 @@ public class MapTestBase {
 
     }
 
-    @Test
-    public void testRemoveException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveExceptionNull() {
 
-        try {
-            map.remove(null);
-            assertTrue(false);
-        } catch (IllegalArgumentException e) {
+        map.remove(null);
 
-        }
-
-        try {
-            map.remove(1);
-            assertTrue(false);
-        }
-        catch (IllegalArgumentException e) {
-
-        }
     }
 
-    @Test
-    public void testPutException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveExceptionNonExistent() {
 
-        try {
-            map.put(null, 1);
-            assertTrue(false);
-        } catch (IllegalArgumentException e) {
-
+        for (int i = 0; i < 100; i++) {
+            map.insert(i, 10);
         }
 
-        try {
-            map.put(1, 1);
-            assertTrue(false);
-        }
-        catch (IllegalArgumentException e) {
+        map.remove(101);
 
-        }
     }
 
-    @Test
-    public void testGetException() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testPutExceptionNull() {
 
-        try {
-            map.get(null);
-            assertTrue(false);
-        } catch (IllegalArgumentException e) {
+        map.put(null, 1);
 
-        }
-
-        try {
-            map.get(1);
-            assertTrue(false);
-        }
-        catch (IllegalArgumentException e) {
-
-        }
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPutExceptionNonExistent() {
+        for (int i = 0; i < 100; i++) {
+            map.insert(i, 10);
+        }
+
+        map.put(101, 20);
+    }
+
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testGetExceptionNull() {
+        
+        map.get(null);
+        
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testGetExceptionNonExistent() {
+        for (int i = 0; i < 100; i++) {
+            map.insert(i, 10);
+        }
+
+        map.get(101);
+    }
+
 
 }

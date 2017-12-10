@@ -195,7 +195,7 @@ public class HashMap108<K, V> implements Map<K, V> {
 
             int position = this.hash(current, func);
 
-            Entry<K, V>[] table = (func==HASH_ONE ? this.table1 : this.table2);
+            Entry<K, V>[] table = (func == HASH_ONE ? this.table1 : this.table2);
 
             Entry<K, V> temp = table[position];
             table[position] = current;
