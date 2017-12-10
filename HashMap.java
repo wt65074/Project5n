@@ -30,7 +30,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private int count;
 
     // Stores how many displacements are okay before a rehash
-    private int maxDisplacements;
+    private int maxDisplacement;
 
     // Hash Functions
     private HashFunction[] hashFunctions;
@@ -105,7 +105,7 @@ public class HashMap<K, V> implements Map<K, V> {
     // Updates the maximum number of displacements.
     private void updateMaxDisplacements(int size) {
         // Compute log2(size)
-        this.maxDisplacements = (int) (Math.log(size * 1.5) / Math.log(2));
+        this.maxDisplacement = (int) (Math.log(size * 1.5) / Math.log(2));
     }
 
     // Rehashes into a new underlying table of size size.
@@ -191,7 +191,7 @@ public class HashMap<K, V> implements Map<K, V> {
         Entry<K, V> current = e;
         int displacements = 0;
 
-        while (displacements++ < this.maxDisplacements) {
+        while (displacements++ < this.maxDisplacement) {
 
             int position = this.hash(current, func);
 
