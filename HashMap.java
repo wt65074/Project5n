@@ -343,7 +343,7 @@ public class HashMap<K, V> implements Map<K, V> {
     @Override
     public String toString() {
 
-        ArrayList<Entry<K, V>> array = new ArrayList<Entry<K, V>> ();
+        ArrayList<Entry<K, V>> array = new ArrayList<Entry<K, V>>();
 
         for (Entry<K, V> e: this.table1) {
             if (e != null) {
@@ -390,16 +390,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
         return keys.iterator();
 
-    }
-
-    public static void main(String[] args) {
-        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-
-        for (int i = 0; i < 10; i++) {
-            map.insert(i, 10);
-        }
-
-        System.out.println(map);
     }
 
 }
