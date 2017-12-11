@@ -343,28 +343,22 @@ public class HashMap<K, V> implements Map<K, V> {
     @Override
     public String toString() {
 
-        ArrayList<Entry<K, V>> array = new ArrayList<Entry<K, V>> ();
-
-        for (Entry<K, V> e: this.table1) {
-            if (e != null) {
-                array.add(e);
-            }
-        }
-        for (Entry<K, V> e: this.table2) {
-            if (e != null) {
-                array.add(e);
-            }
-        }
-
         StringBuilder s = new StringBuilder();
         s.append("{");
-        for (int i = 0; i < array.size(); i++) {
-            Entry<K, V> e = array.get(i);
+        for (int i = 0; i < this.table1.length; i++) {
+            Entry<K, V> e = this.table1[i];
             if (e == null) {
                 continue;
             }
             s.append("" + e.key + ": " + e.value);
-            if (i < array.size() - 1) {
+        }
+        for (int i = 0; i < this.table2.length; i++) {
+            Entry<K, V> e = this.table2[i];
+            if (e == null) {
+                continue;
+            }
+            s.append("" + e.key + ": " + e.value);
+            if (i < this.table2.length - 1) {
                 s.append(", ");
             }
         }
@@ -390,16 +384,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
         return keys.iterator();
 
-    }
-
-    public static void main(String[] args) {
-        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-
-        for (int i = 0; i < 10; i++) {
-            map.insert(i, 10);
-        }
-
-        System.out.println(map);
     }
 
 }
